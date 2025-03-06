@@ -9,9 +9,7 @@ int main() {
 	// File processing. No need for input checks
 	// Not allowed to go over the files more than once
 
-
 	string		file_name1, file_name2;
-	string		line;
 	ifstream	input1, input2;
 
 	// Get first file name
@@ -45,6 +43,31 @@ int main() {
 	// Read from the files one by one: one word from file1 then one word from file2
 	// if one of them finishes early, continue reading the unfinished
 
+	string file_content1, file_content2;
+	string line, word;
+	while( getline(input1, line) ) {
+		file_content1 += line + "\n";
+	}
+	input1.close();
+
+	while( getline(input2, line) ) {
+		file_content2 += line + "\n";
+	}
+	input2.close();
+
+	stringstream file_ss1(file_content1);
+	stringstream file_ss2(file_content2);
+
+	while (file_ss1 >> word) {
+		#ifndef NDEBUG
+			cout << "[DEBUG] " << word << endl;
+		#endif
+	}
+	while (file_ss2 >> word) {
+		#ifndef NDEBUG
+			cout << "[DEBUG] " << word << endl;
+		#endif
+	}
 
 	// Keep 3 linked lists: One for file1 words, one for file2 words, one for common words
 	// a particular word can appear only in one of the three lists
