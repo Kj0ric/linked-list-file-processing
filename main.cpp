@@ -5,6 +5,7 @@
 using namespace std;
 #include "LinkedList.h"
 
+// Displays three lists using their member function printList()
 void displayLists(const LinkedList& l1, const LinkedList& l2, const LinkedList& l3) {
 	// Display list1 (words unique to file1)
 	cout << "\nList for File 1:" << endl;
@@ -29,12 +30,13 @@ int main() {
 	// File processing. No need for input checks
 	// Not allowed to go over the files more than once
 
-	string		file_name1, file_name2;
-	ifstream	input1, input2;
+	string		file_name1, file_name2;		// Store file names received as console input
+	ifstream	input1, input2;				// ifstream objects to read files
+
 	// Keep 3 linked lists: One for file1 words, one for file2 words, one for common words
 	LinkedList list1, list2, common_list;
-	string line1, line2, word1, word2;
-	bool file1_has_data = true;
+	string line1, line2, word1, word2;		// Helper string objects to store the individual lines and words from files
+	bool file1_has_data = true;				// Two flag variables to indicate if the reading of a file is finished
 	bool file2_has_data = true;
 
 	// Get first file name
@@ -72,7 +74,6 @@ int main() {
 	// When you see a common word, delete it from its former linked list and add it to common linked list
 	// Counts are for the number of occurrences of that word read from all the files so far
 	// Nodes are SORTED. Lower count comes before. If same count, alphabetically ascending
-
 	while (file1_has_data || file2_has_data) {
 		// Process file1 if it has data
 		if (file1_has_data && input1 >> word1) {
@@ -125,6 +126,11 @@ int main() {
 	cout << "End of Files.";
 	input1.close();
 	input2.close();
+
+	// Deallocate the memory for the lists
+	list1.selfDestruct();
+	list2.selfDestruct();
+	common_list.selfDestruct();
 
 	return 0;
 }

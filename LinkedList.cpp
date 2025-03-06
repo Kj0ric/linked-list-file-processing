@@ -4,7 +4,7 @@ LinkedList::LinkedList()
 	: head(nullptr)
 {}
 
-
+// Prints the list to the console so that at each line only five words are displayed
 void LinkedList::printList() const {
 	if (!head) {
 		cout << "--||" << endl;
@@ -41,8 +41,8 @@ void LinkedList::printList() const {
 }
 
 
-/* Delete the first occurrence of word
-*/
+// Precondition: The list contains the node with word
+// Postcondition: The node contains word is not in the list
 int LinkedList::deleteItem(const string& word) {
 	Node* p_current = head;
 	Node* p_prev = nullptr;
@@ -71,6 +71,9 @@ int LinkedList::deleteItem(const string& word) {
 	return count;
 }
 
+// Checks if the node containing word is in the list.
+// If yes returns the pointer pointing to that node.
+// If not, return nullptr.
 Node* LinkedList::isInList(const string& word) {
 	Node* p_current = head;
 
@@ -164,5 +167,16 @@ void LinkedList::incrementCount(const string &word) {
 		p_target->next = p_current;
 	}
 }
+
+void LinkedList::selfDestruct() {
+	Node* p_temp;
+
+	while (head) {
+		p_temp = head->next;
+		delete head;
+		head = p_temp;
+	}
+}
+
 
 

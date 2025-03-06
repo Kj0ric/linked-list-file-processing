@@ -5,7 +5,6 @@
 #include <iostream>
 using namespace std;
 
-
 struct Node {
 	string word;
 	int count;
@@ -29,10 +28,9 @@ public:
 	int deleteItem(const string& word);
 	Node* isInList(const string& word);
 	void addItem(const string& word, int count);
-
 	void incrementCount(const string& word);
 	void printList() const;
-
+	void selfDestruct();
 };
 
 
