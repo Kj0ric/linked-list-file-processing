@@ -2,9 +2,28 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include <list>
 using namespace std;
 #include "LinkedList.h"
+
+void displayLists(const LinkedList& l1, const LinkedList& l2, const LinkedList& l3) {
+	// Display list1 (words unique to file1)
+	cout << "\nList for File 1:" << endl;
+	l1.printList();
+	cout << endl;
+
+	// Display list2 (words unique to file2)
+	cout << "List for File 2:" << endl;
+	l2.printList();
+	cout << endl;
+
+	// Display common_list (words common to both files)
+	cout << "Common List:" << endl;
+	l3.printList();
+	cout << endl;
+
+	cout << "#############" << endl;
+	cout << endl; // Extra blank line between displays
+}
 
 int main() {
 	// File processing. No need for input checks
@@ -14,7 +33,7 @@ int main() {
 	ifstream	input1, input2;
 	// Keep 3 linked lists: One for file1 words, one for file2 words, one for common words
 	LinkedList list1, list2, common_list;
-	string line1, line2, word;
+	string line1, line2, word1, word2;
 	bool file1_has_data = true;
 	bool file2_has_data = true;
 
@@ -41,10 +60,11 @@ int main() {
 		cin >> file_name2;
 		input2.open(file_name2);
 	}
-
+	/*
 	#ifndef NDEBUG
 		cout << "[DEBUG] Successfully opened both files" << endl;
 	#endif
+	*/
 
 	// Read from the files one by one: one word from file1 then one word from file2
 	// if one of them finishes early, continue reading the unfinished
@@ -55,46 +75,54 @@ int main() {
 
 	while (file1_has_data || file2_has_data) {
 		// Process file1 if it has data
-		if (file1_has_data && input1 >> word) {
-			cout << "Processing the word \"" << word << "\" from the 1st file." << endl;
-			/*
-			if (list2.isInList(word)) {
-				// If in list2, delete it from list2 and add it to common_list with
-				// the count aggregated
-				list2.deleteItem(word);
-				common_list.addWord(word);
-			} else if (common_list.isInList(word)) {
-				// If in common_list, increment the count there
-				common_list.incrementCount(word);
+		if (file1_has_data && input1 >> word1) {
+			cout << "Processing the word \"" << word1 << "\" from the 1st file." << endl;
 
+			if (common_list.isInList(word1)) {
+				// Simply increment the count
+				common_list.incrementCount(word1);
+			} else if (list2.isInList(word1)) {
+				// Remove from list2, add to common
+				int prev_count = list2.deleteItem(word1);
+				common_list.addItem(word1, prev_count + 1);
+			} else if (list1.isInList(word1)) {
+				// Simply increment the count
+				list1.incrementCount(word1);
 			} else {
-				// word is unique to file1 so far, add to list1
-				list1.addWord(word);
+				// Word is unique to file1 so far
+				list1.addItem(word1, 1);
 			}
-			*/
 		} else {
 			file1_has_data = false;
 		}
 
-		if (file2_has_data && input2 >> word) {
-			cout << "Processing the word \"" << word << "\" from the 2nd file." << endl;
-			/*
-			if (list1.isInList(word)) {
-				// If word is in list1, remove it from list1 and add to common
-				list1.delete(word);
-				common_list.addWord(word);
-			} else if (common_list.isInList(word)) {
-				// If word is in common, increment its count
-				common_list.incrementCount(word);
+		if (file2_has_data && input2 >> word2) {
+			cout << "Processing the word \"" << word2 << "\" from the 2nd file." << endl;
+
+			if (common_list.isInList(word2)) {
+				// Simply increment the count
+				common_list.incrementCount(word2);
+			} else if (list1.isInList(word2)) {
+				// If in list1, it's now common. Remove from list1, add it to common
+				int prev_count = list1.deleteItem(word2);
+				common_list.addItem(word2, prev_count + 1);
+			} else if (list2.isInList(word2)) {
+				// Already in list2, simply increment the count
+				list2.incrementCount(word2);
 			} else {
-				// word is unique to file2 so far, add to list2
-				list2.addWord(word);
+				// Word is unique to file 2 so far, add to list2
+				list2.addItem(word2, 1);
 			}
-			*/
 		} else {
 			file2_has_data = false;
 		}
+
+		// Only display if we successfully read from both files this iteration
+		if ((file1_has_data && !word1.empty()) || (file2_has_data && !word2.empty())) {
+			displayLists(list1, list2, common_list);
+		}
 	}
+	cout << "End of Files.";
 	input1.close();
 	input2.close();
 
