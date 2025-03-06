@@ -25,7 +25,10 @@ private:
 public:
 	LinkedList();
 	void printList();
-	void addWord(const string& word);
+	int deleteItem(const string& word);
+	bool isInList(const string& word);
+	void addItemInOrder(const string& word);
+	void addItem(const string& word);
 };
 
 
