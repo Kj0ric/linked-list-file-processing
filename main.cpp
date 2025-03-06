@@ -2,8 +2,9 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <list>
 using namespace std;
-
+#include "LinkedList.h"
 
 int main() {
 	// File processing. No need for input checks
@@ -11,6 +12,11 @@ int main() {
 
 	string		file_name1, file_name2;
 	ifstream	input1, input2;
+	// Keep 3 linked lists: One for file1 words, one for file2 words, one for common words
+	LinkedList list1, list2, common_list;
+	string line1, line2, word;
+	bool file1_has_data = true;
+	bool file2_has_data = true;
 
 	// Get first file name
 	cout << "Please enter the first file name:" << endl;
@@ -42,40 +48,59 @@ int main() {
 
 	// Read from the files one by one: one word from file1 then one word from file2
 	// if one of them finishes early, continue reading the unfinished
-
-	string file_content1, file_content2;
-	string line, word;
-	while( getline(input1, line) ) {
-		file_content1 += line + "\n";
-	}
-	input1.close();
-
-	while( getline(input2, line) ) {
-		file_content2 += line + "\n";
-	}
-	input2.close();
-
-	stringstream file_ss1(file_content1);
-	stringstream file_ss2(file_content2);
-
-	while (file_ss1 >> word) {
-		#ifndef NDEBUG
-			cout << "[DEBUG] " << word << endl;
-		#endif
-	}
-	while (file_ss2 >> word) {
-		#ifndef NDEBUG
-			cout << "[DEBUG] " << word << endl;
-		#endif
-	}
-
-	// Keep 3 linked lists: One for file1 words, one for file2 words, one for common words
 	// a particular word can appear only in one of the three lists
 	// When you see a common word, delete it from its former linked list and add it to common linked list
 	// Counts are for the number of occurrences of that word read from all the files so far
 	// Nodes are SORTED. Lower count comes before. If same count, alphabetically ascending
 
-	//
+	while (file1_has_data || file2_has_data) {
+		// Process file1 if it has data
+		if (file1_has_data && getline(input1, line1)) {
+			istringstream iss1(line);
+			while (iss1 >> word) {
+				cout << "Processing the word \"" << word << "\" from the 1st file." << endl;
+
+				if (list2.isInList(word)) {
+					// If in list2, delete it from list2 and add it to common_list with
+					// the count aggregated
+					list2.delete(word);
+					common_list.addWord(word);
+				} else if (common_list.isInList(word)) {
+					// If in common_list, increment the count there
+					common_list.incrementCount(word);
+
+				} else {
+					// word is unique to file1 so far, add to list1
+					list1.addWord(word);
+				}
+			}
+		} else {
+			file1_has_data = false;
+		}
+
+		if (file2_has_data && getline(input2, line2)) {
+			istringstream iss2(line2);
+			while (iss2 >> word) {
+				cout << "Processing the word \"" << word << "\" from the 2nd file." << endl;
+
+				if (list1.isInList(word)) {
+					// If word is in list1, remove it from list1 and add to common
+					list1.delete(word);
+					common_list.addWord(word);
+				} else if (common_list.isInList(word)) {
+					// If word is in common, increment its count
+					common_list.incrementCount(word);
+				} else {
+					// word is unique to file2 so far, add to list2
+					list2.addWord(word);
+				}
+			}
+		} else {
+			file2_has_data = false;
+		}
+	}
+	input1.close();
+	input2.close();
 
 	return 0;
 }
