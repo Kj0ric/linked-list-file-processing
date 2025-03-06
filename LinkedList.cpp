@@ -1,16 +1,45 @@
-//
-// Created by Harun Yılmaz on 4.03.2025.
-//
-
 #include "LinkedList.h"
 
 LinkedList::LinkedList()
 	: head(nullptr)
 {}
 
-void LinkedList::printList() {
 
+void LinkedList::printList() const {
+	if (!head) {
+		cout << "--||" << endl;
+		return;
+	}
+
+	int item_count = 0;
+	Node* p_current = head;
+	while (p_current) {
+		cout << p_current->word << "(" << p_current->count << ")";
+
+		p_current = p_current->next;
+		item_count++;
+
+		if (p_current) {
+			// Start a new line after 5 items
+			if (item_count % 5 == 0) {
+				cout << " -->" << endl;
+				//item_count = 0;
+			} else {
+				cout << " --> ";
+			}
+		} else {
+			// End of list, print null
+			cout << " -->";
+			if (item_count % 5 == 0) {
+				cout << endl << "--||";
+			} else {
+				cout << " --||";
+			}
+		}
+	}
+	cout << endl;
 }
+
 
 /* Delete the first occurrence of word
 */
@@ -42,22 +71,98 @@ int LinkedList::deleteItem(const string& word) {
 	return count;
 }
 
-bool LinkedList::isInList(const string& word) {
+Node* LinkedList::isInList(const string& word) {
+	Node* p_current = head;
 
+	while (p_current) {
+		if (p_current->word != word) {
+			// Continue iterating
+			p_current = p_current->next;
+		} else {
+			return p_current;
+		}
+	}
+	return nullptr;
 }
 
-void LinkedList::addNodeInOrder(const string& word) {
+// Precondition: There is no item containing word in the list. The list is ordered.
+// Postcondition: A new node containing word is added to the list. The list is ordered.
+// The list order: Lower count comes before. Among same count, alphabetically ascending
+void LinkedList::addItem(const string &word, int count) {
+	Node* p_current = head;
+	Node* p_prev = nullptr;
+	Node* p_new = new Node(word, count);
 
+	if (!p_current) {
+		// Case 0: List is empty, add to beginning
+		head = p_new;	// Update head
+	} else {
+		while (p_current && (p_current->count < count ||
+				p_current->count == count && p_current->word < word)) {
+			// Iterate until p_current points to the item that is p_new->next
+			p_prev = p_current;
+			p_current = p_current->next;
+		}
+		if (!p_prev) {
+			// Case 1: Adding to the beginning
+			p_new->next = head;
+			head = p_new;
+		} else {
+			// Case 2: Adding to the middle or end
+			p_prev->next = p_new;
+			p_new->next = p_current;
+		}
+	}
 }
 
-/* Add a node containing word if the word is not in the list.
- * If the word is in the list, increment the count of the node containing word
-*/
-void LinkedList::addWord(const string &word) {
-	// Check if word is in the list
-	// If yes, increase the count
-	// Otherwise add the word by keeping the sorted order
+// Precondition: Sorted list, node containing word has count n
+// Postcondition: Sorted list, node containing word has count n+1
+void LinkedList::incrementCount(const string &word) {
+	Node* p_target = this->isInList(word);
+	if (!p_target) return;	// Word not found, nothing to increment
 
+	// Increment the count
+	p_target->count++;
+	int target_count = p_target->count;
+
+	// Remove target node from its current position
+	Node* p_prev = nullptr;
+	Node* p_current = head;
+	while (p_current && p_current != p_target) {
+		p_prev = p_current;
+		p_current = p_current->next;
+	}
+	// Now p_current points to the target node
+	// and p_prev points to the one node before it
+
+	if (p_prev) {
+		// Remove from middle or end
+		p_prev->next = p_target->next;
+	} else {
+		// Remove from head
+		head = p_target->next;
+	}
+
+	// Reinsert target node in sorted position
+	p_target->next = nullptr;
+
+	p_prev = nullptr;
+	p_current = head;
+	while (p_current && (p_current->count < target_count ||
+			(p_current->count == target_count && p_current->word < p_target->word))) {
+		p_prev = p_current;
+		p_current = p_current->next;
+	}
+	// Now target node can be inserted between p_prev and p_current
+	if (!p_prev) {
+		// Insert at head
+		p_target->next = head;
+		head = p_target;
+	} else {
+		// Insert after p_prev
+		p_prev->next = p_target;
+		p_target->next = p_current;
+	}
 }
 
 

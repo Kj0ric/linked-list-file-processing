@@ -1,6 +1,3 @@
-//
-// Created by Harun Yılmaz on 4.03.2025.
-//
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
@@ -14,8 +11,12 @@ struct Node {
 	int count;
 	Node* next;
 
-	Node(const string& w)
+	explicit Node(const string& w)
 		: word(w), count(0), next(nullptr)
+	{}
+
+	Node(const string& w, int count)
+		: word(w), count(count), next(nullptr)
 	{}
 };
 
@@ -24,11 +25,14 @@ private:
 	Node* head;
 public:
 	LinkedList();
-	void printList();
+
 	int deleteItem(const string& word);
-	bool isInList(const string& word);
-	void addItemInOrder(const string& word);
-	void addItem(const string& word);
+	Node* isInList(const string& word);
+	void addItem(const string& word, int count);
+
+	void incrementCount(const string& word);
+	void printList() const;
+
 };
 
 
